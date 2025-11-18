@@ -1,0 +1,259 @@
+/* 모든 요소의 기본 여백과 패딩을 0으로 초기화 */
+/* 브라우저마다 기본값이 달라서 통일하기 위함 */
+* {
+    margin: 0;           /* 바깥 여백 제거 */
+    padding: 0;          /* 안쪽 여백 제거 */
+    box-sizing: border-box;  /* 크기 계산 방식 통일 */
+}
+
+/* body: 페이지 전체 배경 */
+body {
+    /* 폰트 설정: 시스템 기본 폰트 사용 */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    
+    /* 그라디언트 배경 (보라색 계열) */
+    /* linear-gradient: 색상이 부드럽게 전환 */
+    /* 135deg: 대각선 방향 */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* 화면 전체 높이 */
+    height: 100vh;  /* vh = viewport height (화면 높이의 100%) */
+    
+    /* flexbox: 요소를 가운데 정렬하는 최신 방식 */
+    display: flex;
+    justify-content: center;  /* 가로 가운데 정렬 */
+    align-items: center;      /* 세로 가운데 정렬 */
+}
+
+/* 채팅 창 전체 컨테이너 */
+.container {
+    width: 90%;              /* 화면의 90% 너비 */
+    max-width: 800px;        /* 최대 800px (너무 넓어지지 않게) */
+    height: 90vh;            /* 화면 높이의 90% */
+    background: white;       /* 흰색 배경 */
+    border-radius: 20px;     /* 모서리 둥글게 */
+    
+    /* 그림자 효과 (입체감) */
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    
+    /* flexbox로 내부 요소 세로 배치 */
+    display: flex;
+    flex-direction: column;  /* 세로 방향 */
+    
+    overflow: hidden;        /* 넘치는 내용 숨김 */
+}
+
+/* 헤더: 상단 제목 영역 */
+header {
+    background: #667eea;     /* 보라색 배경 */
+    color: white;            /* 흰색 글자 */
+    padding: 20px;           /* 안쪽 여백 */
+    
+    /* flexbox로 제목과 버튼을 양쪽 끝에 배치 */
+    display: flex;
+    justify-content: space-between;  /* 양쪽 끝으로 */
+    align-items: center;             /* 세로 가운데 정렬 */
+}
+
+/* 헤더의 제목 */
+header h1 {
+    font-size: 24px;         /* 글자 크기 */
+    font-weight: 600;        /* 글자 두께 */
+}
+
+/* 대화 초기화 버튼 */
+#clear-btn {
+    background: rgba(255,255,255,0.2);  /* 반투명 흰색 */
+    color: white;
+    border: none;            /* 테두리 없음 */
+    padding: 8px 16px;       /* 안쪽 여백 */
+    border-radius: 8px;      /* 모서리 둥글게 */
+    cursor: pointer;         /* 마우스 올리면 손가락 모양 */
+    
+    /* 호버 효과를 부드럽게 */
+    transition: 0.3s;
+}
+
+/* 버튼에 마우스 올렸을 때 */
+#clear-btn:hover {
+    background: rgba(255,255,255,0.3);  /* 조금 더 불투명하게 */
+}
+
+/* 채팅 메시지 영역 (스크롤 가능) */
+#chat-container {
+    flex: 1;                 /* 남은 공간 모두 차지 */
+    overflow-y: auto;        /* 세로 스크롤 가능 */
+    padding: 20px;           /* 안쪽 여백 */
+    background: #f5f5f5;     /* 연한 회색 배경 */
+}
+
+/* 메시지들이 담기는 컨테이너 */
+#chat-messages {
+    display: flex;
+    flex-direction: column;  /* 세로로 쌓임 */
+    gap: 15px;               /* 메시지 사이 간격 */
+}
+
+/* 개별 메시지 스타일 */
+.message {
+    max-width: 70%;          /* 최대 너비 70% (한쪽에 치우치게) */
+    padding: 12px 16px;      /* 안쪽 여백 */
+    border-radius: 12px;     /* 모서리 둥글게 */
+    word-wrap: break-word;   /* 긴 단어는 줄바꿈 */
+    
+    /* 나타나는 애니메이션 */
+    animation: slideIn 0.3s ease;
+}
+
+/* 메시지 나타나는 애니메이션 효과 */
+@keyframes slideIn {
+    from {
+        opacity: 0;          /* 투명하게 시작 */
+        transform: translateY(10px);  /* 아래에서부터 */
+    }
+    to {
+        opacity: 1;          /* 불투명하게 */
+        transform: translateY(0);     /* 원래 위치로 */
+    }
+}
+
+/* 사용자 메시지 (오른쪽 정렬) */
+.user-message {
+    align-self: flex-end;    /* 오른쪽 끝으로 */
+    background: #667eea;     /* 보라색 배경 */
+    color: white;            /* 흰색 글자 */
+    border-bottom-right-radius: 4px;  /* 오른쪽 아래만 덜 둥글게 (말풍선 효과) */
+}
+
+/* AI 메시지 (왼쪽 정렬) */
+.ai-message {
+    align-self: flex-start;  /* 왼쪽 끝으로 */
+    background: white;       /* 흰색 배경 */
+    color: #333;             /* 어두운 회색 글자 */
+    border-bottom-left-radius: 4px;   /* 왼쪽 아래만 덜 둥글게 */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);  /* 약간의 그림자 */
+}
+
+/* AI 메시지 안의 코드 블록 (여러 줄) */
+.ai-message pre {
+    background: #f0f0f0;     /* 연한 회색 배경 */
+    padding: 10px;           /* 안쪽 여백 */
+    border-radius: 5px;      /* 모서리 둥글게 */
+    overflow-x: auto;        /* 가로로 긴 코드는 스크롤 */
+    margin: 10px 0;          /* 위아래 여백 */
+    font-family: 'Courier New', monospace;  /* 코딩용 폰트 */
+}
+
+/* AI 메시지 안의 인라인 코드 (한 줄) */
+.ai-message code {
+    background: #f0f0f0;     /* 연한 회색 배경 */
+    padding: 2px 6px;        /* 작은 여백 */
+    border-radius: 3px;      /* 살짝 둥글게 */
+    font-family: 'Courier New', monospace;  /* 코딩용 폰트 */
+}
+
+/* 하단 입력 영역 */
+.input-area {
+    padding: 20px;           /* 안쪽 여백 */
+    background: white;       /* 흰색 배경 */
+    border-top: 1px solid #e0e0e0;  /* 상단에 얇은 선 */
+    
+    display: flex;           /* flexbox 사용 */
+    gap: 10px;               /* 요소 사이 간격 */
+}
+
+/* 텍스트 입력창 */
+#user-input {
+    flex: 1;                 /* 남은 공간 모두 차지 */
+    border: 2px solid #e0e0e0;  /* 회색 테두리 */
+    border-radius: 12px;     /* 모서리 둥글게 */
+    padding: 12px;           /* 안쪽 여백 */
+    font-size: 14px;         /* 글자 크기 */
+    resize: none;            /* 크기 조절 막기 */
+    font-family: inherit;    /* 부모 폰트 상속 */
+}
+
+/* 입력창에 포커스(클릭)했을 때 */
+#user-input:focus {
+    outline: none;           /* 기본 테두리 제거 */
+    border-color: #667eea;   /* 보라색 테두리 */
+}
+
+/* 전송 버튼 */
+#send-btn {
+    background: #667eea;     /* 보라색 배경 */
+    color: white;            /* 흰색 글자 */
+    border: none;            /* 테두리 없음 */
+    padding: 0 30px;         /* 좌우 여백 */
+    border-radius: 12px;     /* 모서리 둥글게 */
+    font-size: 16px;         /* 글자 크기 */
+    cursor: pointer;         /* 마우스 올리면 손가락 모양 */
+    transition: 0.3s;        /* 부드러운 전환 효과 */
+}
+
+/* 전송 버튼에 마우스 올렸을 때 */
+#send-btn:hover {
+    background: #5568d3;     /* 조금 더 어두운 보라색 */
+}
+
+/* 전송 버튼 비활성화 상태 (AI 응답 대기 중) */
+#send-btn:disabled {
+    background: #ccc;        /* 회색 */
+    cursor: not-allowed;     /* 금지 표시 커서 */
+}
+
+/* 로딩 표시 영역 */
+#loading {
+    text-align: center;      /* 가운데 정렬 */
+    padding: 20px;           /* 안쪽 여백 */
+    color: #667eea;          /* 보라색 글자 */
+}
+
+/* 로딩 스피너 (빙글빙글 도는 원) */
+.loading-spinner {
+    /* 테두리로 원 만들기 */
+    border: 3px solid #f3f3f3;        /* 연한 회색 테두리 */
+    border-top: 3px solid #667eea;    /* 위쪽만 보라색 (회전 효과) */
+    border-radius: 50%;               /* 완전한 원 */
+    width: 30px;                      /* 너비 */
+    height: 30px;                     /* 높이 */
+    
+    /* 회전 애니메이션 */
+    animation: spin 1s linear infinite;
+    
+    /* 가운데 정렬 */
+    margin: 0 auto 10px auto;
+}
+
+/* 회전 애니메이션 정의 */
+@keyframes spin {
+    0% { transform: rotate(0deg); }      /* 시작: 0도 */
+    100% { transform: rotate(360deg); }  /* 끝: 360도 (한 바퀴) */
+}
+
+/* 모델 표시 영역 */
+#model-indicator {
+    text-align: center;      /* 가운데 정렬 */
+    padding: 10px;           /* 안쪽 여백 */
+    font-size: 12px;         /* 작은 글자 */
+    color: #666;             /* 회색 글자 */
+    font-style: italic;      /* 기울임체 */
+}
+
+/* 스크롤바 커스터마이징 (웹킷 브라우저: 크롬, 사파리) */
+#chat-container::-webkit-scrollbar {
+    width: 8px;              /* 스크롤바 너비 */
+}
+
+#chat-container::-webkit-scrollbar-track {
+    background: #f1f1f1;     /* 스크롤바 트랙 배경 */
+}
+
+#chat-container::-webkit-scrollbar-thumb {
+    background: #888;        /* 스크롤바 색상 */
+    border-radius: 4px;      /* 모서리 둥글게 */
+}
+
+#chat-container::-webkit-scrollbar-thumb:hover {
+    background: #555;        /* 마우스 올리면 어둡게 */
+}
