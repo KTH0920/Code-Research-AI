@@ -81,10 +81,21 @@ def chat():
     # 사용자 메시지를 분석해서 어떤 모델을 사용할지 결정
     selected_model = choose_model(user_message)
     
+    # ========== 디버깅 코드 시작 ==========
+    print(f"\n{'='*50}")
+    print(f"📩 사용자 메시지: {user_message}")
+    print(f"🤖 선택된 모델: {selected_model}")
+    print(f"🔑 세션 ID: {session_id}")
+    # ========== 디버깅 코드 끝 ==========
+    
     # 이 세션의 대화 내역이 없으면 빈 리스트로 초기화
     # 처음 대화하는 사용자면 새로운 대화 공간을 만들어줍니다
     if session_id not in conversations:
         conversations[session_id] = []
+        
+        # ========== 디버깅 코드 시작 ==========
+        print(f"✨ 새 대화 시작! 시스템 프롬프트 적용 중...")
+        # ========== 디버깅 코드 끝 ==========
         
         # 시스템 프롬프트: AI의 역할과 행동 방식을 정의
         # 이것이 AI의 성능을 크게 향상시킵니다!
@@ -104,7 +115,13 @@ def chat():
 - 한국어로 친절하고 명확하게 설명합니다
 - 복잡한 개념은 간단한 예시로 설명합니다
 - 코드는 반드시 ``` 로 감싸서 제공합니다
-- 필요하다면 실행 방법도 함께 알려줍니다"""
+- 필요하다면 실행 방법도 함께 알려줍니다
+- 코드 주석은 반드시 한국어로 작성합니다"""
+            
+            # ========== 디버깅 코드 시작 ==========
+            print(f"🔧 시스템 프롬프트 적용됨: 코딩 전문가 모드")
+            # ========== 디버깅 코드 끝 ==========
+            
         else:
             # 리서칭 모델용 시스템 프롬프트
             # 리서치와 설명에 특화된 역할 부여
@@ -122,6 +139,10 @@ def chat():
 - 핵심 내용을 먼저 설명하고 세부사항으로 확장합니다
 - 필요하다면 비유나 실생활 예시를 활용합니다
 - 관련된 추가 학습 방향도 제안합니다"""
+            
+            # ========== 디버깅 코드 시작 ==========
+            print(f"🔍 시스템 프롬프트 적용됨: 리서칭 전문가 모드")
+            # ========== 디버깅 코드 끝 ==========
         
         # 시스템 메시지를 대화 내역의 맨 앞에 추가
         # role: 'system' = AI의 역할을 정의하는 특별한 메시지
@@ -129,12 +150,35 @@ def chat():
             'role': 'system',           # 역할: 시스템 (AI의 정체성 정의)
             'content': system_prompt     # 내용: 위에서 만든 역할 설명
         })
+        
+        # ========== 디버깅 코드 시작 ==========
+        print(f"📚 대화 내역 길이: {len(conversations[session_id])} (시스템 프롬프트 포함)")
+        # ========== 디버깅 코드 끝 ==========
+    
+    else:
+        # ========== 디버깅 코드 시작 ==========
+        print(f"🔄 기존 대화 이어가기 (대화 내역: {len(conversations[session_id])}개 메시지)")
+        # ========== 디버깅 코드 끝 ==========
     
     # 사용자 메시지를 대화 내역에 추가
+    # 코딩 질문일 경우 명시적으로 한국어 요청 추가
+    if 'deepseek-coder' in selected_model:
+        # 코딩 질문: 한국어 지시를 강하게 추가
+        enhanced_message = f"{user_message}\n\n(답변은 반드시 한국어로 작성하고, 코드 주석도 한국어로 달아주세요.)"
+    else:
+        # 리서칭 질문: 그대로 사용
+        enhanced_message = user_message
+    
     conversations[session_id].append({
         'role': 'user',           # 역할: 사용자
-        'content': user_message    # 내용: 사용자가 입력한 메시지
+        'content': enhanced_message    # 내용: 강화된 메시지
     })
+    
+    # ========== 디버깅 코드 시작 ==========
+    print(f"📝 전송된 메시지: {enhanced_message[:50]}...")
+    print(f"⏳ AI 응답 생성 중...")
+    print(f"{'='*50}\n")
+    # ========== 디버깅 코드 끝 ==========
     
     # try-except: 에러가 발생할 수 있는 코드를 안전하게 실행
     try:
@@ -148,6 +192,12 @@ def chat():
         # AI의 답변 텍스트만 추출
         # response는 딕셔너리 형태로 오는데, 그 안의 message -> content를 가져옴
         ai_message = response['message']['content']
+        
+        # ========== 디버깅 코드 시작 ==========
+        print(f"✅ AI 응답 생성 완료!")
+        print(f"📝 응답 길이: {len(ai_message)} 글자")
+        print(f"🔤 응답 시작 부분: {ai_message[:100]}...")
+        # ========== 디버깅 코드 끝 ==========
         
         # AI 답변도 대화 내역에 추가 (다음 대화를 위해 기억해야 함)
         conversations[session_id].append({
@@ -166,14 +216,21 @@ def chat():
     except Exception as e:
         # Exception: 모든 종류의 에러를 잡음
         # e: 에러 정보를 담고 있는 변수
-        print(f"에러 발생: {e}")  # 콘솔에 에러 출력 (디버깅용)
+        
+        # ========== 디버깅 코드 시작 ==========
+        print(f"❌ 에러 발생!")
+        print(f"에러 내용: {e}")
+        print(f"{'='*50}\n")
+        # ========== 디버깅 코드 끝 ==========
+        
+        # 콘솔에 에러 출력 (디버깅용)
+        print(f"에러 발생: {e}")
         
         # 에러 메시지를 사용자에게 전달
         return jsonify({
             'success': False,          # 실패
             'error': str(e)            # 에러 내용을 문자열로 변환
         }), 500  # 500: HTTP 상태 코드 (서버 내부 에러)
-
 
 # 대화 내역을 초기화하는 API 엔드포인트
 @app.route('/clear', methods=['POST'])
@@ -185,9 +242,17 @@ def clear_history():
     data = request.json
     session_id = data.get('session_id', 'default')
     
+    # ========== 디버깅 코드 시작 ==========
+    print(f"\n🗑️  대화 초기화 요청: 세션 ID = {session_id}")
+    # ========== 디버깅 코드 끝 ==========
+    
     # 해당 세션의 대화 내역이 있으면 빈 리스트로 초기화
     if session_id in conversations:
         conversations[session_id] = []
+        
+        # ========== 디버깅 코드 시작 ==========
+        print(f"✨ 대화 내역 삭제 완료!\n")
+        # ========== 디버깅 코드 끝 ==========
     
     # 성공 응답 반환
     return jsonify({'success': True})
@@ -196,6 +261,14 @@ def clear_history():
 # 프로그램이 직접 실행될 때만 아래 코드 실행
 # 다른 파일에서 import 할 때는 실행되지 않음
 if __name__ == '__main__':
+    # ========== 디버깅 코드 시작 ==========
+    print("\n" + "="*50)
+    print("🚀 Code & Research AI 서버 시작!")
+    print("🌐 주소: http://localhost:5000")
+    print("🛑 종료하려면 Ctrl+C 누르세요")
+    print("="*50 + "\n")
+    # ========== 디버깅 코드 끝 ==========
+    
     # Flask 웹 서버 시작!
     app.run(
         debug=True,   # 디버그 모드: 코드 수정하면 자동으로 서버 재시작
