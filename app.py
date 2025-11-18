@@ -85,6 +85,115 @@ def chat():
     # 처음 대화하는 사용자면 새로운 대화 공간을 만들어줍니다
     if session_id not in conversations:
         conversations[session_id] = []
+        
+        # 시스템 프롬프트: AI의 역할과 행동 방식을 정의
+        # 이것이 AI의 성능을 크게 향상시킵니다!
+        if 'deepseek-coder' in selected_model:
+            # 코딩 모델용 시스템 프롬프트
+            # AI에게 "너는 이런 전문가야"라고 알려주는 역할
+            system_prompt = """당신은 경험이 풍부한 전문 프로그래머입니다.
+
+주요 역할:
+- 명확하고 실행 가능한 코드를 작성합니다
+- 코드에는 초보자도 이해할 수 있게 상세한 주석을 답니다
+- 여러 해결 방법이 있다면 장단점과 함께 최선의 방법을 추천합니다
+- 에러나 버그가 있다면 원인을 분석하고 단계별 해결 방법을 제시합니다
+- 코드 품질, 성능, 가독성을 모두 고려합니다
+
+응답 방식:
+- 한국어로 친절하고 명확하게 설명합니다
+- 복잡한 개념은 간단한 예시로 설명합니다
+- 코드는 반드시 ``` 로 감싸서 제공합니다
+- 필요하다면 실행 방법도 함께 알려줍니다"""
+        else:
+            # 리서칭 모델용 시스템 프롬프트
+            # 리서치와 설명에 특화된 역할 부여
+            system_prompt = """당신은 지식이 풍부하고 분석력이 뛰어난 전문 연구원입니다.
+
+주요 역할:
+- 정확하고 구체적인 정보를 제공합니다
+- 복잡한 개념을 이해하기 쉽게 설명합니다
+- 여러 관점에서 균형잡힌 시각을 제시합니다
+- 최신 트렌드와 발전 방향을 함께 설명합니다
+- 실용적인 예시와 응용 방법을 제시합니다
+
+응답 방식:
+- 한국어로 친절하고 체계적으로 설명합니다
+- 핵심 내용을 먼저 설명하고 세부사항으로 확장합니다
+- 필요하다면 비유나 실생활 예시를 활용합니다
+- 관련된 추가 학습 방향도 제안합니다"""
+        
+        # 시스템 메시지를 대화 내역의 맨 앞에 추가
+        # role: 'system' = AI의 역할을 정의하는 특별한 메시지
+        conversations[session_id].append({
+            'role': 'system',           # 역할: 시스템 (AI의 정체성 정의)
+            'content': system_prompt     # 내용: 위에서 만든 역할 설명
+        })
+    
+    # 사용자 메시지를 대화 내역에 추가
+    conversations[session_id].append({
+        'role': 'user',           # 역할: 사용자
+        'content': user_message    # 내용: 사용자가 입력한 메시지
+    })
+    
+    # try-except: 에러가 발생할 수 있는 코드를 안전하게 실행
+    try:
+        # ollama.chat(): AI 모델에게 질문하고 답변 받기
+        # 시스템 프롬프트가 포함된 전체 대화 내역을 전달합니다
+        response = ollama.chat(
+            model=selected_model,                    # 선택된 AI 모델 사용
+            messages=conversations[session_id]       # 시스템 프롬프트 + 대화 내역
+        )
+        
+        # AI의 답변 텍스트만 추출
+        # response는 딕셔너리 형태로 오는데, 그 안의 message -> content를 가져옴
+        ai_message = response['message']['content']
+        
+        # AI 답변도 대화 내역에 추가 (다음 대화를 위해 기억해야 함)
+        conversations[session_id].append({
+            'role': 'assistant',      # 역할: AI 어시스턴트
+            'content': ai_message     # 내용: AI가 생성한 답변
+        })
+        
+        # 성공! 결과를 JSON 형태로 반환
+        return jsonify({
+            'success': True,              # 성공 여부
+            'response': ai_message,       # AI의 답변
+            'model_used': selected_model  # 어떤 모델을 사용했는지 (참고용)
+        })
+        
+    # 에러가 발생하면 이 블록이 실행됩니다
+    except Exception as e:
+        # Exception: 모든 종류의 에러를 잡음
+        # e: 에러 정보를 담고 있는 변수
+        print(f"에러 발생: {e}")  # 콘솔에 에러 출력 (디버깅용)
+        
+        # 에러 메시지를 사용자에게 전달
+        return jsonify({
+            'success': False,          # 실패
+            'error': str(e)            # 에러 내용을 문자열로 변환
+        }), 500  # 500: HTTP 상태 코드 (서버 내부 에러)
+    """
+    사용자의 채팅 메시지를 받아서 AI에게 전달하고 응답을 돌려주는 함수
+    """
+    # request.json: 사용자가 보낸 JSON 데이터를 받습니다
+    data = request.json
+    
+    # JSON에서 'message' 키의 값을 가져옵니다 (사용자가 입력한 메시지)
+    user_message = data.get('message')
+    
+    # JSON에서 'session_id' 키의 값을 가져옵니다
+    # 없으면 기본값으로 'default' 사용
+    # session_id: 여러 사용자를 구분하는 고유 번호 (쿠키처럼)
+    session_id = data.get('session_id', 'default')
+    
+    # 사용자 메시지를 분석해서 어떤 모델을 사용할지 결정
+    selected_model = choose_model(user_message)
+    
+    # 이 세션의 대화 내역이 없으면 빈 리스트로 초기화
+    # 처음 대화하는 사용자면 새로운 대화 공간을 만들어줍니다
+    if session_id not in conversations:
+        conversations[session_id] = []
     
     # 사용자 메시지를 대화 내역에 추가
     conversations[session_id].append({
