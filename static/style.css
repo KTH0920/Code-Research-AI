@@ -19,22 +19,15 @@ body {
     /* 화면 전체 높이 */
     height: 100vh;  /* vh = viewport height (화면 높이의 100%) */
     
-    /* flexbox: 요소를 가운데 정렬하는 최신 방식 */
-    display: flex;
-    justify-content: center;  /* 가로 가운데 정렬 */
-    align-items: center;      /* 세로 가운데 정렬 */
+    /* 스크롤바 숨기기 */
+    overflow: hidden;
 }
 
-/* 채팅 창 전체 컨테이너 */
+/* 채팅 창 전체 컨테이너 - 이제 전체 화면 사용 */
 .container {
-    width: 90%;              /* 화면의 90% 너비 */
-    max-width: 800px;        /* 최대 800px (너무 넓어지지 않게) */
-    height: 90vh;            /* 화면 높이의 90% */
+    width: 100%;             /* 화면 전체 너비 */
+    height: 100vh;           /* 화면 전체 높이 */
     background: white;       /* 흰색 배경 */
-    border-radius: 20px;     /* 모서리 둥글게 */
-    
-    /* 그림자 효과 (입체감) */
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
     
     /* flexbox로 내부 요소 세로 배치 */
     display: flex;
@@ -47,17 +40,20 @@ body {
 header {
     background: #667eea;     /* 보라색 배경 */
     color: white;            /* 흰색 글자 */
-    padding: 20px;           /* 안쪽 여백 */
+    padding: 25px 40px;      /* 안쪽 여백 (위아래 25px, 좌우 40px) */
     
     /* flexbox로 제목과 버튼을 양쪽 끝에 배치 */
     display: flex;
     justify-content: space-between;  /* 양쪽 끝으로 */
     align-items: center;             /* 세로 가운데 정렬 */
+    
+    /* 그림자 효과 (입체감) */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 /* 헤더의 제목 */
 header h1 {
-    font-size: 24px;         /* 글자 크기 */
+    font-size: 28px;         /* 글자 크기 */
     font-weight: 600;        /* 글자 두께 */
 }
 
@@ -66,9 +62,10 @@ header h1 {
     background: rgba(255,255,255,0.2);  /* 반투명 흰색 */
     color: white;
     border: none;            /* 테두리 없음 */
-    padding: 8px 16px;       /* 안쪽 여백 */
+    padding: 10px 20px;      /* 안쪽 여백 */
     border-radius: 8px;      /* 모서리 둥글게 */
     cursor: pointer;         /* 마우스 올리면 손가락 모양 */
+    font-size: 14px;         /* 글자 크기 */
     
     /* 호버 효과를 부드럽게 */
     transition: 0.3s;
@@ -77,13 +74,14 @@ header h1 {
 /* 버튼에 마우스 올렸을 때 */
 #clear-btn:hover {
     background: rgba(255,255,255,0.3);  /* 조금 더 불투명하게 */
+    transform: translateY(-1px);        /* 살짝 위로 */
 }
 
 /* 채팅 메시지 영역 (스크롤 가능) */
 #chat-container {
     flex: 1;                 /* 남은 공간 모두 차지 */
     overflow-y: auto;        /* 세로 스크롤 가능 */
-    padding: 20px;           /* 안쪽 여백 */
+    padding: 30px 40px;      /* 안쪽 여백 */
     background: #f5f5f5;     /* 연한 회색 배경 */
 }
 
@@ -91,15 +89,19 @@ header h1 {
 #chat-messages {
     display: flex;
     flex-direction: column;  /* 세로로 쌓임 */
-    gap: 15px;               /* 메시지 사이 간격 */
+    gap: 20px;               /* 메시지 사이 간격 */
+    max-width: 1200px;       /* 최대 너비 제한 (너무 넓으면 읽기 어려움) */
+    margin: 0 auto;          /* 가운데 정렬 */
 }
 
 /* 개별 메시지 스타일 */
 .message {
     max-width: 70%;          /* 최대 너비 70% (한쪽에 치우치게) */
-    padding: 12px 16px;      /* 안쪽 여백 */
+    padding: 15px 20px;      /* 안쪽 여백 */
     border-radius: 12px;     /* 모서리 둥글게 */
     word-wrap: break-word;   /* 긴 단어는 줄바꿈 */
+    line-height: 1.6;        /* 줄 간격 */
+    font-size: 15px;         /* 글자 크기 */
     
     /* 나타나는 애니메이션 */
     animation: slideIn 0.3s ease;
@@ -131,35 +133,40 @@ header h1 {
     background: white;       /* 흰색 배경 */
     color: #333;             /* 어두운 회색 글자 */
     border-bottom-left-radius: 4px;   /* 왼쪽 아래만 덜 둥글게 */
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);  /* 약간의 그림자 */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);  /* 약간의 그림자 */
 }
 
 /* AI 메시지 안의 코드 블록 (여러 줄) */
 .ai-message pre {
-    background: #f0f0f0;     /* 연한 회색 배경 */
-    padding: 10px;           /* 안쪽 여백 */
-    border-radius: 5px;      /* 모서리 둥글게 */
+    background: #f8f8f8;     /* 연한 회색 배경 */
+    padding: 15px;           /* 안쪽 여백 */
+    border-radius: 8px;      /* 모서리 둥글게 */
     overflow-x: auto;        /* 가로로 긴 코드는 스크롤 */
-    margin: 10px 0;          /* 위아래 여백 */
+    margin: 15px 0;          /* 위아래 여백 */
     font-family: 'Courier New', monospace;  /* 코딩용 폰트 */
+    border: 1px solid #e0e0e0;  /* 얇은 테두리 */
 }
 
 /* AI 메시지 안의 인라인 코드 (한 줄) */
 .ai-message code {
     background: #f0f0f0;     /* 연한 회색 배경 */
-    padding: 2px 6px;        /* 작은 여백 */
-    border-radius: 3px;      /* 살짝 둥글게 */
+    padding: 3px 8px;        /* 작은 여백 */
+    border-radius: 4px;      /* 살짝 둥글게 */
     font-family: 'Courier New', monospace;  /* 코딩용 폰트 */
+    font-size: 14px;         /* 글자 크기 */
 }
 
 /* 하단 입력 영역 */
 .input-area {
-    padding: 20px;           /* 안쪽 여백 */
+    padding: 25px 40px;      /* 안쪽 여백 */
     background: white;       /* 흰색 배경 */
     border-top: 1px solid #e0e0e0;  /* 상단에 얇은 선 */
     
     display: flex;           /* flexbox 사용 */
-    gap: 10px;               /* 요소 사이 간격 */
+    gap: 15px;               /* 요소 사이 간격 */
+    max-width: 1200px;       /* 최대 너비 */
+    margin: 0 auto;          /* 가운데 정렬 */
+    width: 100%;             /* 전체 너비 */
 }
 
 /* 텍스트 입력창 */
@@ -167,16 +174,18 @@ header h1 {
     flex: 1;                 /* 남은 공간 모두 차지 */
     border: 2px solid #e0e0e0;  /* 회색 테두리 */
     border-radius: 12px;     /* 모서리 둥글게 */
-    padding: 12px;           /* 안쪽 여백 */
-    font-size: 14px;         /* 글자 크기 */
+    padding: 15px;           /* 안쪽 여백 */
+    font-size: 15px;         /* 글자 크기 */
     resize: none;            /* 크기 조절 막기 */
     font-family: inherit;    /* 부모 폰트 상속 */
+    transition: 0.3s;        /* 부드러운 전환 */
 }
 
 /* 입력창에 포커스(클릭)했을 때 */
 #user-input:focus {
     outline: none;           /* 기본 테두리 제거 */
     border-color: #667eea;   /* 보라색 테두리 */
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);  /* 발광 효과 */
 }
 
 /* 전송 버튼 */
@@ -184,9 +193,10 @@ header h1 {
     background: #667eea;     /* 보라색 배경 */
     color: white;            /* 흰색 글자 */
     border: none;            /* 테두리 없음 */
-    padding: 0 30px;         /* 좌우 여백 */
+    padding: 0 35px;         /* 좌우 여백 */
     border-radius: 12px;     /* 모서리 둥글게 */
     font-size: 16px;         /* 글자 크기 */
+    font-weight: 600;        /* 글자 두께 */
     cursor: pointer;         /* 마우스 올리면 손가락 모양 */
     transition: 0.3s;        /* 부드러운 전환 효과 */
 }
@@ -194,12 +204,15 @@ header h1 {
 /* 전송 버튼에 마우스 올렸을 때 */
 #send-btn:hover {
     background: #5568d3;     /* 조금 더 어두운 보라색 */
+    transform: translateY(-2px);  /* 살짝 위로 */
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);  /* 그림자 */
 }
 
 /* 전송 버튼 비활성화 상태 (AI 응답 대기 중) */
 #send-btn:disabled {
     background: #ccc;        /* 회색 */
     cursor: not-allowed;     /* 금지 표시 커서 */
+    transform: none;         /* 움직임 없음 */
 }
 
 /* 로딩 표시 영역 */
@@ -215,8 +228,8 @@ header h1 {
     border: 3px solid #f3f3f3;        /* 연한 회색 테두리 */
     border-top: 3px solid #667eea;    /* 위쪽만 보라색 (회전 효과) */
     border-radius: 50%;               /* 완전한 원 */
-    width: 30px;                      /* 너비 */
-    height: 30px;                     /* 높이 */
+    width: 40px;                      /* 너비 */
+    height: 40px;                     /* 높이 */
     
     /* 회전 애니메이션 */
     animation: spin 1s linear infinite;
@@ -235,14 +248,15 @@ header h1 {
 #model-indicator {
     text-align: center;      /* 가운데 정렬 */
     padding: 10px;           /* 안쪽 여백 */
-    font-size: 12px;         /* 작은 글자 */
+    font-size: 13px;         /* 작은 글자 */
     color: #666;             /* 회색 글자 */
     font-style: italic;      /* 기울임체 */
+    background: #f9f9f9;     /* 연한 배경 */
 }
 
 /* 스크롤바 커스터마이징 (웹킷 브라우저: 크롬, 사파리) */
 #chat-container::-webkit-scrollbar {
-    width: 8px;              /* 스크롤바 너비 */
+    width: 10px;             /* 스크롤바 너비 */
 }
 
 #chat-container::-webkit-scrollbar-track {
@@ -251,9 +265,35 @@ header h1 {
 
 #chat-container::-webkit-scrollbar-thumb {
     background: #888;        /* 스크롤바 색상 */
-    border-radius: 4px;      /* 모서리 둥글게 */
+    border-radius: 5px;      /* 모서리 둥글게 */
 }
 
 #chat-container::-webkit-scrollbar-thumb:hover {
     background: #555;        /* 마우스 올리면 어둡게 */
+}
+
+/* 반응형 디자인: 화면이 작을 때 */
+@media (max-width: 768px) {
+    /* 모바일에서는 여백 줄이기 */
+    header {
+        padding: 20px 20px;
+    }
+    
+    #chat-container {
+        padding: 20px 15px;
+    }
+    
+    .input-area {
+        padding: 15px 15px;
+    }
+    
+    /* 메시지 너비 늘리기 */
+    .message {
+        max-width: 85%;
+    }
+    
+    /* 글자 크기 조정 */
+    header h1 {
+        font-size: 22px;
+    }
 }

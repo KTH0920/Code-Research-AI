@@ -27,7 +27,7 @@ def choose_model(user_message):
         user_message: 사용자가 입력한 메시지 (문자열)
     
     반환값:
-        'deepseek-coder' 또는 'gemma2' (문자열)
+        'qwen2.5-coder:7b' 또는 'gemma2' (문자열)
     """
     # 코딩 관련 키워드들을 리스트로 정의
     # 이 단어들이 메시지에 있으면 코딩 질문으로 판단
@@ -35,7 +35,8 @@ def choose_model(user_message):
         '코드', '코딩', '프로그래밍', '파이썬', 'python', 
         '함수', '변수', '클래스', '에러', '오류', '버그', 
         'javascript', 'js', 'html', 'css', 'react', 
-        'java', 'c++', 'sql', '알고리즘', '디버깅'
+        'java', 'c++', 'sql', '알고리즘', '디버깅',
+        'typescript', 'git', '배포', '개발'
     ]
     
     # 메시지를 소문자로 변환 (대소문자 구분 없이 검색하기 위해)
@@ -44,9 +45,11 @@ def choose_model(user_message):
     # any(): 리스트 안의 조건 중 하나라도 True면 True 반환
     # keyword in message_lower: 키워드가 메시지에 포함되어 있는지 확인
     if any(keyword in message_lower for keyword in coding_keywords):
-        return 'deepseek-coder'  # 코딩 전문가 모델 선택
+        # qwen2.5-coder: 한국어 지원 우수 + 코딩 특화 모델
+        return 'qwen2.5-coder:7b'
     else:
-        return 'gemma2'  # 리서칭/범용 모델 선택
+        # gemma2: 리서칭/범용 모델
+        return 'gemma2'
 
 
 # 웹사이트의 메인 페이지 (홈페이지)
@@ -99,27 +102,27 @@ def chat():
         
         # 시스템 프롬프트: AI의 역할과 행동 방식을 정의
         # 이것이 AI의 성능을 크게 향상시킵니다!
-        if 'deepseek-coder' in selected_model:
+        if 'qwen2.5-coder' in selected_model or 'deepseek-coder' in selected_model:
             # 코딩 모델용 시스템 프롬프트
             # AI에게 "너는 이런 전문가야"라고 알려주는 역할
             system_prompt = """당신은 경험이 풍부한 전문 프로그래머입니다.
 
 주요 역할:
 - 명확하고 실행 가능한 코드를 작성합니다
-- 코드에는 초보자도 이해할 수 있게 상세한 주석을 답니다
+- 코드에는 초보자도 이해할 수 있게 상세한 한국어 주석을 답니다
 - 여러 해결 방법이 있다면 장단점과 함께 최선의 방법을 추천합니다
 - 에러나 버그가 있다면 원인을 분석하고 단계별 해결 방법을 제시합니다
 - 코드 품질, 성능, 가독성을 모두 고려합니다
 
 응답 방식:
-- 한국어로 친절하고 명확하게 설명합니다
+- 모든 설명은 한국어로 친절하고 명확하게 작성합니다
 - 복잡한 개념은 간단한 예시로 설명합니다
 - 코드는 반드시 ``` 로 감싸서 제공합니다
-- 필요하다면 실행 방법도 함께 알려줍니다
-- 코드 주석은 반드시 한국어로 작성합니다"""
+- 코드 주석은 반드시 한국어로 작성합니다
+- 필요하다면 실행 방법도 함께 알려줍니다"""
             
             # ========== 디버깅 코드 시작 ==========
-            print(f"🔧 시스템 프롬프트 적용됨: 코딩 전문가 모드")
+            print(f"🔧 시스템 프롬프트 적용됨: 코딩 전문가 모드 (qwen2.5-coder)")
             # ========== 디버깅 코드 끝 ==========
             
         else:
@@ -141,7 +144,7 @@ def chat():
 - 관련된 추가 학습 방향도 제안합니다"""
             
             # ========== 디버깅 코드 시작 ==========
-            print(f"🔍 시스템 프롬프트 적용됨: 리서칭 전문가 모드")
+            print(f"🔍 시스템 프롬프트 적용됨: 리서칭 전문가 모드 (gemma2)")
             # ========== 디버깅 코드 끝 ==========
         
         # 시스템 메시지를 대화 내역의 맨 앞에 추가
@@ -162,9 +165,9 @@ def chat():
     
     # 사용자 메시지를 대화 내역에 추가
     # 코딩 질문일 경우 명시적으로 한국어 요청 추가
-    if 'deepseek-coder' in selected_model:
+    if 'qwen2.5-coder' in selected_model or 'deepseek-coder' in selected_model:
         # 코딩 질문: 한국어 지시를 강하게 추가
-        enhanced_message = f"{user_message}\n\n(답변은 반드시 한국어로 작성하고, 코드 주석도 한국어로 달아주세요.)"
+        enhanced_message = f"{user_message}\n\n(답변과 코드 주석은 반드시 한국어로 작성해주세요.)"
     else:
         # 리서칭 질문: 그대로 사용
         enhanced_message = user_message
@@ -232,6 +235,7 @@ def chat():
             'error': str(e)            # 에러 내용을 문자열로 변환
         }), 500  # 500: HTTP 상태 코드 (서버 내부 에러)
 
+
 # 대화 내역을 초기화하는 API 엔드포인트
 @app.route('/clear', methods=['POST'])
 def clear_history():
@@ -265,6 +269,8 @@ if __name__ == '__main__':
     print("\n" + "="*50)
     print("🚀 Code & Research AI 서버 시작!")
     print("🌐 주소: http://localhost:5000")
+    print("🤖 코딩: qwen2.5-coder:7b (한국어 우수)")
+    print("🔍 리서칭: gemma2 (한국어 우수)")
     print("🛑 종료하려면 Ctrl+C 누르세요")
     print("="*50 + "\n")
     # ========== 디버깅 코드 끝 ==========
