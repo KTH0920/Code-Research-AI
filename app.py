@@ -17,7 +17,7 @@ app = Flask(__name__)
 # 각 사용자(세션)마다 대화 내역을 따로 저장합니다
 conversations = {}
 
-
+    
 # 사용자 메시지를 분석해서 어떤 AI 모델을 사용할지 결정하는 함수
 def choose_model(user_message):
     """
