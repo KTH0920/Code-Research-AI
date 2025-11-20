@@ -1,76 +1,91 @@
 <!DOCTYPE html>
-<!-- HTML5 문서 타입 선언 -->
 <html lang="ko">
-<!-- lang="ko": 이 페이지는 한국어로 작성되었다고 브라우저에 알림 -->
-
 <head>
-    <!-- head: 페이지의 설정 정보가 들어가는 부분 (화면에는 안 보임) -->
-    
-    <!-- 문자 인코딩을 UTF-8로 설정 (한글이 깨지지 않게) -->
     <meta charset="UTF-8">
-    
-    <!-- 반응형 디자인을 위한 설정 (모바일에서도 잘 보이게) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- 브라우저 탭에 보이는 제목 -->
     <title>Code & Research AI</title>
-    
-    <!-- CSS 파일 연결: 디자인(스타일)을 담당하는 파일 -->
-    <!-- url_for(): Flask가 static 폴더의 파일 경로를 자동으로 찾아줌 -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
-    <!-- body: 실제 화면에 보이는 내용들이 들어가는 부분 -->
-    
-    <!-- 전체를 감싸는 컨테이너 (큰 상자) -->
-    <div class="container">
-        
-        <!-- 헤더: 상단 제목 영역 -->
-        <header>
-            <!-- 페이지 제목 -->
-            <h1>🤖 Code & Research AI</h1>
-            
-            <!-- 대화 초기화 버튼 -->
-            <!-- onclick: 클릭하면 clearChat() 함수 실행 -->
-            <button id="clear-btn" onclick="clearChat()">대화 초기화</button>
-        </header>
-        
-        <!-- 채팅 메시지들이 표시되는 영역 -->
-        <div id="chat-container">
-            <!-- 실제 메시지들이 여기에 동적으로 추가됩니다 -->
-            <div id="chat-messages"></div>
-        </div>
-        
-        <!-- 사용자 입력 영역 (하단) -->
-        <div class="input-area">
-            <!-- textarea: 여러 줄 입력 가능한 텍스트 상자 -->
-            <textarea 
-                id="user-input" 
-                placeholder="질문을 입력하세요... (Shift+Enter로 전송)"
-                rows="3"
-            ></textarea>
-            
-            <!-- 전송 버튼 -->
-            <!-- onclick: 클릭하면 sendMessage() 함수 실행 -->
-            <button id="send-btn" onclick="sendMessage()">전송</button>
-        </div>
-        
-        <!-- 로딩 표시 (AI가 답변 생성 중일 때만 보임) -->
-        <!-- style="display: none;": 처음엔 숨겨져 있음 -->
-        <div id="loading" style="display: none;">
-            <div class="loading-spinner"></div>
-            <p>AI가 생각 중입니다...</p>
-        </div>
-        
-        <!-- 어떤 모델이 사용되는지 표시하는 영역 -->
-        <div id="model-indicator" style="display: none;">
-            <!-- JavaScript로 동적으로 내용이 채워짐 -->
+    <div class="app-wrapper">
+        <!-- 사이드바 (선택적) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">✨</div>
+                    <h2>Code & Research AI</h2>
+                </div>
+            </div>
+            <div class="sidebar-actions">
+                <button id="clear-btn" onclick="clearChat()" class="sidebar-btn">
+                    <span class="btn-icon">🔄</span>
+                    <span>새 대화</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 컨테이너 -->
+        <div class="main-container">
+            <!-- 상단 헤더 (모바일용) -->
+            <header class="mobile-header">
+                <div class="mobile-header-content">
+                    <h1>Code & Research AI</h1>
+                    <button id="mobile-clear-btn" onclick="clearChat()" class="mobile-clear-btn">
+                        <span>🔄</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 채팅 영역 -->
+            <main class="chat-main">
+                <div id="chat-container">
+                    <div id="chat-messages"></div>
+                    
+                    <!-- 로딩 표시 -->
+                    <div id="loading" style="display: none;">
+                        <div class="loading-message">
+                            <div class="message ai-message">
+                                <div class="message-avatar">AI</div>
+                                <div class="message-content">
+                                    <div class="typing-indicator">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 모델 표시 -->
+                <div id="model-indicator" style="display: none;"></div>
+            </main>
+
+            <!-- 입력 영역 -->
+            <div class="input-wrapper">
+                <div class="input-container">
+                    <div class="input-box">
+                        <textarea 
+                            id="user-input" 
+                            placeholder="메시지를 입력하세요..."
+                            rows="1"
+                        ></textarea>
+                        <button id="send-btn" onclick="sendMessage()" class="send-button" aria-label="전송">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <span class="input-hint">Shift + Enter로 줄바꿈</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- JavaScript 파일 연결: 동작(기능)을 담당하는 파일 -->
-    <!-- 페이지 맨 끝에 위치 (HTML이 다 로딩된 후 실행되게) -->
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

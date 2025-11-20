@@ -32,7 +32,7 @@ async function sendMessage() {
     
     // UI 비활성화 (중복 전송 방지)
     sendBtn.disabled = true;                    // 전송 버튼 비활성화
-    loading.style.display = 'block';            // 로딩 표시 보이기
+    loading.style.display = 'flex';             // 로딩 표시 보이기
     
     // try-catch: 에러가 발생할 수 있는 코드를 안전하게 실행
     try {
@@ -90,22 +90,35 @@ async function sendMessage() {
 function addMessage(text, type) {
     // 새 div 요소 생성 (메시지 하나를 담을 상자)
     const messageDiv = document.createElement('div');
-    
-    // 클래스 추가: 'message'와 'user-message' 또는 'ai-message'
-    // 예: type이 'user'면 → 'message user-message'
     messageDiv.className = `message ${type}-message`;
+    
+    // 아바타 생성
+    const avatar = document.createElement('div');
+    avatar.className = 'message-avatar';
+    avatar.textContent = type === 'user' ? 'U' : 'AI';
+    
+    // 메시지 컨텐츠 생성
+    const messageContent = document.createElement('div');
+    messageContent.className = 'message-content';
+    
+    const messageText = document.createElement('div');
+    messageText.className = 'message-text';
     
     // 메시지 내용을 포맷팅해서 HTML로 변환
     const formattedText = formatMessage(text);
-    messageDiv.innerHTML = formattedText;
+    messageText.innerHTML = formattedText;
+    
+    // 구조 조립
+    messageContent.appendChild(messageText);
+    messageDiv.appendChild(avatar);
+    messageDiv.appendChild(messageContent);
     
     // 메시지를 채팅 영역에 추가
-    // appendChild(): 자식 요소로 추가 (맨 아래에 붙음)
     chatMessages.appendChild(messageDiv);
     
     // 스크롤을 맨 아래로 이동 (최신 메시지 보이게)
-    // scrollHeight: 전체 내용의 높이
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    const chatContainer = document.getElementById('chat-container');
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
 
@@ -147,24 +160,40 @@ function formatMessage(text) {
 function showModelIndicator(modelName) {
     // 모델 이름에 따라 한글로 변환
     let displayName;
-    if (modelName === 'deepseek-coder') {
-        displayName = '🔧 코딩 전문가';
+    let icon = '🤖';
+    
+    if (modelName.includes('qwen2.5-coder') || modelName === 'deepseek-coder') {
+        displayName = '코딩 전문가';
+        icon = '💻';
     } else if (modelName === 'gemma2') {
-        displayName = '🔍 리서칭 전문가';
+        displayName = '리서칭 전문가';
+        icon = '🔍';
     } else {
         displayName = modelName;  // 알 수 없는 모델이면 그대로 표시
     }
     
     // 모델 표시 영역에 텍스트 설정
-    modelIndicator.textContent = `사용된 모델: ${displayName}`;
+    modelIndicator.innerHTML = `<span>${icon}</span> <strong>${displayName}</strong> 모델 사용 중`;
     modelIndicator.style.display = 'block';  // 표시
     
-    // 3초 후 자동으로 숨김
-    // setTimeout(): 일정 시간 후 함수 실행
-    // 3000 = 3000밀리초 = 3초
+    // 부드러운 페이드인 효과
+    modelIndicator.style.opacity = '0';
+    modelIndicator.style.transform = 'translateY(-10px)';
     setTimeout(() => {
-        modelIndicator.style.display = 'none';
-    }, 3000);
+        modelIndicator.style.transition = 'all 0.3s ease';
+        modelIndicator.style.opacity = '1';
+        modelIndicator.style.transform = 'translateY(0)';
+    }, 10);
+    
+    // 4초 후 자동으로 숨김
+    setTimeout(() => {
+        modelIndicator.style.transition = 'all 0.3s ease';
+        modelIndicator.style.opacity = '0';
+        modelIndicator.style.transform = 'translateY(-10px)';
+        setTimeout(() => {
+            modelIndicator.style.display = 'none';
+        }, 300);
+    }, 4000);
 }
 
 
@@ -223,6 +252,12 @@ userInput.addEventListener('keydown', function(e) {
         sendMessage();       // 메시지 전송
     }
     // Shift+Enter는 기본 동작(줄바꿈)이 그대로 실행됨
+});
+
+// 입력창 높이 자동 조절
+userInput.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 200) + 'px';
 });
 
 
